@@ -1,0 +1,42 @@
+@model List<StockControl.Models.Category>
+@{
+    ViewData["Title"] = "Kategori Yonetimi";
+}
+
+<div class="card">
+    <h2>Yeni Kategori Ekle</h2>
+    @if (TempData["CategoryError"] is string error)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    <form asp-action="Create" method="post" style="display:flex; gap:10px; align-items:center;">
+        <input name="name" placeholder="Kategori adi..." />
+        <button class="btn btn-primary" type="submit">Ekle</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Kategoriler</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Ad</th>
+                <th>Islem</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@category.Id" />
+                        <button class="btn btn-danger" type="submit">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

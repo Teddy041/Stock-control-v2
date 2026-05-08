@@ -1,0 +1,7 @@
+<svg width="160" height="42" viewBox="0 0 160 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="40" height="40" rx="10" fill="#D6BFA1" stroke="#8B6F47" stroke-width="2"/>
+  <path d="M11 15H31V19H11V15ZM11 23H31V27H11V23Z" fill="#5C4630"/>
+  <circle cx="26" cy="31" r="3" fill="#5C4630"/>
+  <text x="50" y="18" fill="#4A3826" font-size="12" font-family="Arial, sans-serif" font-weight="700">Stok Kontrol</text>
+  <text x="50" y="32" fill="#7A6248" font-size="10" font-family="Arial, sans-serif">Yonetim Paneli</text>
+</svg>

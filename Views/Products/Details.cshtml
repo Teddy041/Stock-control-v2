@@ -1,0 +1,77 @@
+@model StockControl.ViewModels.ProductDetailsVm
+@{
+    ViewData["Title"] = "Urun Detay";
+}
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>@Model.Product.Name (@Model.Product.Code)</h2>
+        <a class="btn btn-secondary" asp-action="Catalog">Kataloga Don</a>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Product.ImagePath))
+    {
+        <img src="@Model.Product.ImagePath" alt="@Model.Product.Name" class="product-thumb" />
+    }
+    <p><b>Kategori:</b> @Model.Product.Category</p>
+    <p><b>Stok:</b> @Model.Product.Quantity</p>
+    <p><b>Birim Fiyat:</b> @Model.Product.UnitPrice.ToString("C")</p>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (ViewBag.CanUpdateStock is true)
+{
+    <div class="card">
+        <h3>Stok Giris/Cikis</h3>
+        <form asp-action="AddMovement" method="post">
+            <input type="hidden" name="productId" value="@Model.Product.Id" />
+            <div class="grid">
+                <div>
+                    <label>Tip</label>
+                    <select name="type">
+                        <option value="Entry">Giris</option>
+                        <option value="Exit">Cikis</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Miktar</label>
+                    <input name="amount" type="number" min="1" />
+                </div>
+                <div style="grid-column: span 2;">
+                    <label>Aciklama</label>
+                    <textarea name="description"></textarea>
+                </div>
+            </div>
+            <br />
+            <button class="btn btn-primary" type="submit">Hareket Ekle</button>
+        </form>
+    </div>
+}
+
+<div class="card">
+    <h3>Hareket Geçmisi</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tarih</th>
+                <th>Tip</th>
+                <th>Miktar</th>
+                <th>Aciklama</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var m in Model.Movements)
+        {
+            <tr>
+                <td>@m.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>@m.Type</td>
+                <td>@m.Amount</td>
+                <td>@m.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

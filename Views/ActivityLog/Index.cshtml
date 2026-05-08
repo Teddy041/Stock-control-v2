@@ -1,0 +1,87 @@
+@model IReadOnlyList<StockControl.Models.ActivityLog>
+@using StockControl.Data
+@{
+    ViewData["Title"] = "Aktivite Logu";
+    var page = (int)(ViewBag.Page ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var totalCount = (int)(ViewBag.TotalCount ?? 0);
+}
+
+<div class="card">
+    <h2 style="margin-top: 0;">Aktivite logu</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Kullanici siparisleri (checkout), yonetici stok hareketleri, urun ve kategori islemleri, stok talepleri.
+        Toplam <strong>@totalCount</strong> kayit.
+    </p>
+
+    @if (Model.Count == 0)
+    {
+        <p>Henuz log kaydi yok.</p>
+    }
+    else
+    {
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Zaman</th>
+                        <th>Olay</th>
+                        <th>Kullanici</th>
+                        <th>Rol</th>
+                        <th>Ozet</th>
+                        <th>Detay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td style="white-space: nowrap; font-size: 13px;" title="@row.CreatedAt.ToString("u") UTC">
+                            @row.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                        </td>
+                        <td>
+                            <span style="font-size: 12px; font-weight: 600;">@ActivityLogExtensions.ActivityEventDisplayTurkish(row.EventType)</span>
+                        </td>
+                        <td style="font-size: 13px;">@row.UserName</td>
+                        <td style="font-size: 13px;">@(row.ActorRole ?? "—")</td>
+                        <td style="font-size: 14px;">@row.Summary</td>
+                        <td style="font-size: 13px; max-width: 420px;">
+                            @if (!string.IsNullOrWhiteSpace(row.Details))
+                            {
+                                <span class="log-details">@row.Details</span>
+                            }
+                            else
+                            {
+                                <span style="color: var(--text-muted);">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <p style="margin-top: 1rem; font-size: 14px;">
+                Sayfa @(page) / @(totalPages)
+                @if (page > 1)
+                {
+                    <a class="btn btn-secondary" asp-action="Index" asp-route-page="@(page - 1)">Onceki</a>
+                }
+                @if (page < totalPages)
+                {
+                    <a class="btn btn-secondary" asp-action="Index" asp-route-page="@(page + 1)">Sonraki</a>
+                }
+            </p>
+        }
+    }
+</div>
+
+<style>
+    .log-details {
+        white-space: pre-wrap;
+        word-break: break-word;
+        display: block;
+    }
+</style>

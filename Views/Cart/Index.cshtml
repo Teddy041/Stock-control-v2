@@ -1,0 +1,68 @@
+@model StockControl.ViewModels.CartVm
+@{
+    ViewData["Title"] = "Sepet";
+}
+
+<div class="card">
+    <h2>Sepetim</h2>
+
+    @if (TempData["CartError"] is string cartError)
+    {
+        <div class="alert alert-danger">@cartError</div>
+    }
+    @if (TempData["CartSuccess"] is string cartSuccess)
+    {
+        <div class="alert" style="background:#dff2df;color:#245224;">@cartSuccess</div>
+    }
+
+    @if (!Model.Items.Any())
+    {
+        <p>Sepetiniz bos.</p>
+        <a class="btn btn-secondary" asp-controller="Products" asp-action="Catalog">Kataloga Don</a>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Urun</th>
+                    <th>Birim Fiyat</th>
+                    <th>Miktar</th>
+                    <th>Toplam</th>
+                    <th>Islem</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.UnitPrice.ToString("C")</td>
+                    <td>
+                        <form asp-action="Update" method="post" style="display:flex; gap:8px; align-items:center;">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="number" name="quantity" min="0" max="@item.AvailableStock" value="@item.Quantity" style="max-width:90px;" />
+                            <button type="submit" class="btn btn-secondary">Guncelle</button>
+                        </form>
+                    </td>
+                    <td>@item.LineTotal.ToString("C")</td>
+                    <td>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-danger">Kaldir</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        <br />
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Genel Toplam: @Model.GrandTotal.ToString("C")</strong>
+            <form asp-action="Checkout" method="post">
+                <button type="submit" class="btn btn-primary">Satin Al</button>
+            </form>
+        </div>
+    }
+</div>

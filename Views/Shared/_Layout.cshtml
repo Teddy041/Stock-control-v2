@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>@ViewData["Title"] - Stok Kontrol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --font: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+            --sidebar: #0f172a;
+            --sidebar-border: #1e293b;
+            --sidebar-hover: #1e293b;
+            --sidebar-text: #94a3b8;
+            --sidebar-active: #38bdf8;
+            --surface: #ffffff;
+            --surface-muted: #f8fafc;
+            --page-bg: #eef2f7;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --radius: 10px;
+            --radius-lg: 14px;
+            --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--font);
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--page-bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ----- Misafir (giris oncesi): tamamen farkli gorunum ----- */
+        body.layout-guest {
+            background: linear-gradient(145deg, #1e3a5f 0%, #0f172a 45%, #172554 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        body.layout-guest .guest-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px 48px;
+        }
+
+        body.layout-guest .guest-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            color: #e2e8f0;
+        }
+
+        body.layout-guest .guest-brand img {
+            height: 48px;
+            width: 48px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+        body.layout-guest .guest-brand span {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        body.layout-guest .guest-brand .brand-link {
+            color: #e2e8f0;
+        }
+
+        body.layout-guest .guest-brand .brand-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        body.layout-guest .guest-footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: rgba(226, 232, 240, 0.55);
+        }
+
+        /* ----- Oturum: yan panel + ana alan ----- */
+        body.layout-app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .app-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: var(--sidebar);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+
+        .app-sidebar__brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 20px 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 16px;
+        }
+
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.15s, transform 0.12s;
+        }
+
+        .brand-link:hover {
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .app-sidebar__brand .brand-link:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .app-sidebar__brand img {
+            height: 40px;
+            width: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .app-sidebar__brand span {
+            color: #f1f5f9;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .app-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0 12px;
+        }
+
+        .app-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--sidebar-text);
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .app-nav a:hover {
+            background: var(--sidebar-hover);
+            color: #e2e8f0;
+            text-decoration: none;
+        }
+
+        .app-nav a.nav-emphasis {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--sidebar-active);
+        }
+
+        .app-nav a.nav-emphasis:hover {
+            background: rgba(37, 99, 235, 0.25);
+            color: #7dd3fc;
+        }
+
+        .app-sidebar__spacer { flex: 1; min-height: 12px; }
+
+        .app-sidebar__foot {
+            padding: 16px 20px 0;
+            border-top: 1px solid var(--sidebar-border);
+            margin-top: 12px;
+        }
+
+        .app-user {
+            font-size: 12px;
+            color: var(--sidebar-text);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .app-shell {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .app-topbar {
+            background: var(--surface);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 520px;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: var(--surface-muted);
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background: #fff;
+        }
+
+        .site-main {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .site-footer {
+            padding: 16px 24px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--surface);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        body.layout-app .site-footer {
+            margin-top: auto;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow-lg);
+            padding: 22px 24px;
+            margin-bottom: 18px;
+        }
+
+        .card h2, .card h3 {
+            margin-top: 0;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 14px;
+            background: var(--surface-muted);
+            color: var(--text);
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td {
+            background: rgba(241, 245, 249, 0.8);
+        }
+
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: background 0.15s, transform 0.12s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            text-decoration: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        @@media (max-width: 640px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .text-danger { color: var(--danger); }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .product-thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        @@media (max-width: 960px) {
+            .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @@media (max-width: 560px) {
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+
+        .catalog-card {
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            background: var(--surface);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .catalog-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .catalog-card .product-thumb {
+            width: 100%;
+            height: 140px;
+        }
+
+        .catalog-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .stock-indicator {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 52px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .stock-yellow { background: #facc15; color: #422006; }
+        .stock-red { background: #ef4444; color: #fff; }
+        .stock-black { background: #1e293b; color: #fff; }
+
+        .stock-alert {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #b91c1c;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ---- Responsive ---- */
+        @@media (max-width: 1024px) {
+            .app-sidebar {
+                width: 220px;
+            }
+
+            .site-main {
+                padding: 18px;
+            }
+        }
+
+        @@media (max-width: 860px) {
+            body.layout-app {
+                display: block;
+            }
+
+            .app-sidebar {
+                width: 100%;
+                border-right: 0;
+                border-bottom: 1px solid var(--sidebar-border);
+                padding: 14px 0 10px;
+            }
+
+            .app-sidebar__brand {
+                margin-bottom: 10px;
+                padding: 0 14px 12px;
+            }
+
+            .app-nav {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 0 10px 6px;
+                gap: 8px;
+            }
+
+            .app-nav a {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .app-sidebar__spacer {
+                display: none;
+            }
+
+            .app-sidebar__foot {
+                margin-top: 8px;
+                padding: 10px 14px 0;
+            }
+
+            .app-topbar {
+                padding: 12px 14px;
+            }
+
+            .search-form {
+                max-width: none;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .site-main {
+                padding: 14px;
+            }
+        }
+
+        @@media (max-width: 640px) {
+            body {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 14px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-form .btn {
+                width: 100%;
+            }
+
+            table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            thead th,
+            tbody td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .catalog-card {
+                min-height: 0;
+            }
+
+            .catalog-card .product-thumb {
+                height: 120px;
+            }
+
+            .site-footer,
+            .guest-footer {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+@using StockControl.Data
+@{
+    var authed = User.Identity?.IsAuthenticated ?? false;
+    var hideBar = ViewData["HideNavbar"] as bool? ?? false;
+    var canManageProducts = User.HasPermission(Permissions.ManageProducts);
+    var canManageCategories = User.HasPermission(Permissions.ManageCategories);
+    var canHandleRequests = User.HasPermission(Permissions.HandleStockRequests);
+    var canViewLogs = User.HasPermission(Permissions.ViewLogs);
+    var canManageUsers = User.HasPermission(Permissions.ManageUsers);
+}
+<body class="@(authed && !hideBar ? "layout-app" : "layout-guest")">
+@if (authed && !hideBar)
+{
+    <aside class="app-sidebar" aria-label="Menu">
+        <div class="app-sidebar__brand">
+            <a class="brand-link" asp-controller="Products" asp-action="Catalog">
+                <img src="/logo-user.png" alt="" onerror="this.onerror=null;this.src='/logo.svg';" />
+                <span>Stok Kontrol</span>
+            </a>
+        </div>
+        <nav class="app-nav">
+            <a class="nav-secondary" asp-controller="Products" asp-action="Catalog">Katalog</a>
+            @if (User.IsInRole("User"))
+            {
+                <a class="nav-secondary" asp-controller="Cart" asp-action="Index">Sepet</a>
+            }
+            @if (canManageProducts)
+            {
+                <a class="nav-emphasis" asp-controller="Products" asp-action="Index">Admin Paneli</a>
+            }
+            @if (canManageCategories)
+            {
+                <a class="nav-emphasis" asp-controller="Categories" asp-action="Index">Kategori Yonetimi</a>
+            }
+            @if (canHandleRequests)
+            {
+                <a class="nav-emphasis" asp-controller="Notifications" asp-action="Index">Bildirimler</a>
+            }
+            @if (canViewLogs)
+            {
+                <a class="nav-emphasis" asp-controller="ActivityLog" asp-action="Index">Aktivite logu</a>
+            }
+            @if (canManageUsers)
+            {
+                <a class="nav-emphasis" asp-controller="UserManagement" asp-action="Index">Yetki paneli</a>
+            }
+        </nav>
+        <div class="app-sidebar__spacer"></div>
+        <div class="app-sidebar__foot">
+            <div class="app-user" title="@User.Identity?.Name">@User.Identity?.Name</div>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button class="btn btn-danger" type="submit">Cikis</button>
+            </form>
+        </div>
+    </aside>
+    <div class="app-shell">
+        <header class="app-topbar">
+            <form class="search-form" asp-controller="Products" asp-action="Catalog" method="get">
+                <input type="text" name="q" value="@(ViewBag.Query ?? "")" placeholder="Urun, kod veya kategori ara..." autocomplete="off" />
+                <button class="btn btn-primary" type="submit">Ara</button>
+            </form>
+        </header>
+        <main class="site-main">
+            @RenderBody()
+        </main>
+        <footer class="site-footer">Stok Kontrol &middot; Stok ve katalog yonetimi</footer>
+    </div>
+}
+else
+{
+    <div class="guest-wrap">
+        <div class="guest-brand">
+            <a class="brand-link" asp-controller="Account" asp-action="Login">
+                <img src="/logo-user.png" alt="" onerror="this.onerror=null;this.src='/logo.svg';" />
+                <span>Stok Kontrol</span>
+            </a>
+        </div>
+        <main class="site-main" style="padding: 0; max-width: 480px;">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="guest-footer">Stok Kontrol</footer>
+}
+</body>
+</html>

@@ -1,0 +1,81 @@
+@model StockControl.ViewModels.AdminNotificationsVm
+@{
+    ViewData["Title"] = "Bildirimler";
+}
+
+<div class="card">
+    <h2>Azalan Stok Bildirimleri</h2>
+    @if (!Model.LowStockProducts.Any())
+    {
+        <p>Azalan stok bildirimi bulunmuyor.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Urun</th>
+                    <th>Kategori</th>
+                    <th>Stok</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var product in Model.LowStockProducts)
+            {
+                var stockClass = product.Quantity < 10 ? "stock-black" : product.Quantity < 25 ? "stock-red" : "stock-yellow";
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Category</td>
+                    <td>
+                        <div class="stock-indicator @stockClass">
+                            @product.Quantity
+                            <span class="stock-alert">!</span>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div class="card">
+    <h2>Kullanicidan Gelen Stok Talepleri</h2>
+    @if (!Model.OpenStockRequests.Any())
+    {
+        <p>Bekleyen stok talebi bulunmuyor.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Urun</th>
+                    <th>Talep Eden</th>
+                    <th>Miktar</th>
+                    <th>Not</th>
+                    <th>Tarih</th>
+                    <th>Islem</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var request in Model.OpenStockRequests)
+            {
+                <tr>
+                    <td>@request.Product.Name</td>
+                    <td>@request.RequestedByUserName</td>
+                    <td>@request.RequestedAmount</td>
+                    <td>@request.Note</td>
+                    <td>@request.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <td>
+                        <form asp-action="MarkRequestHandled" method="post">
+                            <input type="hidden" name="id" value="@request.Id" />
+                            <button class="btn btn-primary" type="submit">Tamamlandi Isaretle</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>

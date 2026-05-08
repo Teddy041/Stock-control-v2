@@ -1,4 +1,3 @@
-
 # Stock Control (ASP.NET Core)
 
 Bu proje stok ve katalog yonetimi icin gelistirilmis bir web uygulamasidir (ASP.NET Core 8, MVC).

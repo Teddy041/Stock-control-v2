@@ -1,0 +1,83 @@
+@model List<StockControl.Models.Product>
+@{
+    ViewData["Title"] = "Urunler";
+}
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Urun Listesi</h2>
+        <a class="btn btn-primary" asp-action="Create">Yeni Urun</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Kod</th>
+                <th>Ad</th>
+                <th>Kategori</th>
+                <th>Birim Fiyat</th>
+                <th>Stok</th>
+                <th>Islem</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            var stockClass = "";
+            var showAlert = false;
+            if (item.Quantity < 10)
+            {
+                stockClass = "stock-black";
+                showAlert = true;
+            }
+            else if (item.Quantity < 25)
+            {
+                stockClass = "stock-red";
+                showAlert = true;
+            }
+            else if (item.Quantity < 50)
+            {
+                stockClass = "stock-yellow";
+                showAlert = true;
+            }
+
+            <tr>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(item.ImagePath))
+                    {
+                        <img src="@item.ImagePath" alt="@item.Name" class="product-thumb" />
+                    }
+                </td>
+                <td>@item.Code</td>
+                <td>@item.Name</td>
+                <td>@item.Category</td>
+                <td>@item.UnitPrice.ToString("C")</td>
+                <td>
+                    @if (showAlert)
+                    {
+                        <div class="stock-indicator @stockClass">
+                            @item.Quantity
+                            <span class="stock-alert">!</span>
+                        </div>
+                    }
+                    else
+                    {
+                        @item.Quantity
+                    }
+                </td>
+                <td>
+                    <div class="actions">
+                        <a class="btn btn-secondary" asp-action="Details" asp-route-id="@item.Id">Detay</a>
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Duzenle</a>
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button class="btn btn-danger" type="submit">Sil</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

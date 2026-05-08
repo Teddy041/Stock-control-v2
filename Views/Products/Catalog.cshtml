@@ -1,0 +1,83 @@
+@model Dictionary<string, List<StockControl.Models.Product>>
+@{
+    ViewData["Title"] = "Katalog";
+    var query = ViewBag.Query as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(query))
+{
+    <div class="card">
+        "<b>@query</b>" icin sonuclar
+    </div>
+}
+
+@if (ViewBag.RequestMessage is string requestMessage)
+{
+    <div class="card">
+        @requestMessage
+    </div>
+}
+@if (TempData["CartError"] is string cartError)
+{
+    <div class="card alert alert-danger">
+        @cartError
+    </div>
+}
+@if (TempData["CartSuccess"] is string cartSuccess)
+{
+    <div class="card" style="background:#dff2df;color:#245224;">
+        @cartSuccess
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card">
+        Aramaniza uygun urun bulunamadi.
+    </div>
+}
+else
+{
+    @foreach (var group in Model)
+    {
+        <div class="card">
+            <h2>@group.Key</h2>
+            <div class="catalog-grid">
+                @foreach (var item in group.Value)
+                {
+                    <div class="catalog-card">
+                        @if (!string.IsNullOrWhiteSpace(item.ImagePath))
+                        {
+                            <img src="@item.ImagePath" alt="@item.Name" class="product-thumb" />
+                        }
+                        <h4 class="catalog-title">@item.Name</h4>
+                        <div><b>Kategori:</b> @item.Category</div>
+                        <div>@item.Code</div>
+                        <div>@item.UnitPrice.ToString("C")</div>
+                        <div><b>Stok:</b> @item.Quantity</div>
+                        @if (User.IsInRole("User") && item.Quantity > 0)
+                        {
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                <input type="hidden" name="productId" value="@item.Id" />
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <input type="number" name="quantity" min="1" max="@item.Quantity" value="1" style="max-width:80px;" />
+                                    <button class="btn btn-primary" type="submit">Sepete Ekle</button>
+                                </div>
+                            </form>
+                        }
+                        @if (!User.IsInRole("Admin") && item.Quantity <= 0)
+                        {
+                            <form asp-action="RequestStock" method="post">
+                                <input type="hidden" name="productId" value="@item.Id" />
+                                <input type="hidden" name="requestedAmount" value="20" />
+                                <input type="hidden" name="note" value="Katalog ekranindan otomatik talep." />
+                                <button class="btn btn-danger" type="submit">Stok Iste</button>
+                            </form>
+                        }
+                        <a class="btn btn-secondary" asp-action="Details" asp-route-id="@item.Id">Detay</a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}

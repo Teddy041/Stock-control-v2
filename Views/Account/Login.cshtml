@@ -1,0 +1,30 @@
+@model StockControl.ViewModels.LoginVm
+@{
+    ViewData["Title"] = "Giris";
+}
+
+<div class="card" style="max-width: 480px; margin: 0 auto;">
+    <h2>Giris Yap</h2>
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div>
+            <label asp-for="UserName">Kullanici Adi</label>
+            <input asp-for="UserName" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <br />
+        <div>
+            <label asp-for="Password"></label>
+            <input asp-for="Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <br />
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">Giris</button>
+            <a class="btn btn-secondary" asp-action="Register">Kayit Ol</a>
+        </div>
+    </form>
+    <hr />
+    <p><b>Admin:</b> admin123 / admin123</p>
+    <p><b>Kullanici:</b> user123 / user123</p>
+</div>

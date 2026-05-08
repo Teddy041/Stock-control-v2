@@ -1,0 +1,121 @@
+@model StockControl.ViewModels.UserManagementVm
+@{
+    ViewData["Title"] = "Yetki Paneli";
+}
+
+<div class="card">
+    <h2>Yetki Paneli</h2>
+    <p style="color: var(--text-muted);">Uyeleri ara, yeni uye olustur, izinleri guncelle.</p>
+
+    @if (TempData["UserMgmtError"] is string err)
+    {
+        <div class="alert alert-danger">@err</div>
+    }
+    @if (TempData["UserMgmtSuccess"] is string ok)
+    {
+        <div class="alert" style="background:#ecfdf5; border-color:#86efac; color:#166534;">@ok</div>
+    }
+
+    <form method="get" asp-action="Index" style="margin-bottom: 12px;">
+        <div class="actions">
+            <input type="text" name="q" value="@Model.Query" placeholder="Kullanici adi ara..." style="max-width: 280px;" />
+            <button class="btn btn-primary" type="submit">Ara</button>
+            <a class="btn btn-secondary" asp-action="Index">Temizle</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Yeni Uye Olustur</h3>
+    <form asp-action="CreateUser" method="post">
+        @Html.AntiForgeryToken()
+        <div class="grid">
+            <div>
+                <label>Kullanici Adi</label>
+                <input name="UserName" required minlength="3" />
+            </div>
+            <div>
+                <label>Sifre</label>
+                <input name="Password" type="password" required minlength="6" />
+            </div>
+        </div>
+        <br />
+        <button class="btn btn-primary" type="submit">Uye Olustur</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Uye Listesi</h3>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kullanici</th>
+                    <th>Rol</th>
+                    <th>Urun</th>
+                    <th>Stok</th>
+                    <th>Log</th>
+                    <th>Kategori</th>
+                    <th>Talep</th>
+                    <th>Yetki</th>
+                    <th>Islem</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var u in Model.Users)
+            {
+                <tr>
+                    <td>@u.UserName</td>
+                    <td>@(u.IsRootUser ? "Patron (admin123)" : (u.IsAdmin ? "Admin" : "User"))</td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanManageProducts" value="true" checked="@u.CanManageProducts" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanUpdateStock" value="true" checked="@u.CanUpdateStock" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanViewLogs" value="true" checked="@u.CanViewLogs" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanManageCategories" value="true" checked="@u.CanManageCategories" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanHandleStockRequests" value="true" checked="@u.CanHandleStockRequests" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td><input form="perm-@u.UserId" type="checkbox" name="CanManageUsers" value="true" checked="@u.CanManageUsers" disabled="@(u.IsAdmin || u.IsRootUser)" /></td>
+                    <td>
+                        @if (!u.IsRootUser)
+                        {
+                            <form asp-action="ResetPassword" method="post" style="display:flex; gap:6px; margin-top:6px;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.UserId" />
+                                <input type="password" name="newPassword" placeholder="Yeni sifre" minlength="6" required style="max-width:140px;" />
+                                <button class="btn btn-secondary" type="submit">Sifre Sifirla</button>
+                            </form>
+                        }
+                        @if (!u.IsAdmin && !u.IsRootUser)
+                        {
+                            <form id="perm-@u.UserId" asp-action="UpdatePermissions" method="post" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="UserId" value="@u.UserId" />
+                                <button class="btn btn-primary" type="submit">Kaydet</button>
+                            </form>
+                            <form asp-action="SetAllPermissions" method="post" style="display:inline-flex; margin-top:6px;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.UserId" />
+                                <input type="hidden" name="grantAll" value="true" />
+                                <button class="btn btn-secondary" type="submit">Tumunu Ver</button>
+                            </form>
+                            <form asp-action="SetAllPermissions" method="post" style="display:inline-flex; margin-top:6px;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.UserId" />
+                                <input type="hidden" name="grantAll" value="false" />
+                                <button class="btn btn-secondary" type="submit">Tumunu Kaldir</button>
+                            </form>
+                            <form asp-action="DeleteUser" method="post" style="margin-top:6px;" onsubmit="return confirm('Bu uyeyi silmek istediginize emin misiniz?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.UserId" />
+                                <button class="btn btn-danger" type="submit">Uyeyi Sil</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span style="font-size:12px;color:var(--text-muted);">Sabit / Korumali</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
