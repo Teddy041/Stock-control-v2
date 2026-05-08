@@ -6,11 +6,12 @@ Bu proje stok ve katalog yonetimi icin gelistirilmis bir web uygulamasidir (ASP.
 
 ## Onceki surume gore eklenenler
 
-- Modern ve mobil uyumlu site tasarimi (yenilenmis layout, responsive menu, kart yapisi)
+- Modern ve mobil uyumlu site tasarimi (yenilenmis layout, responsive site, kart yapisi)
 - Aktivite loglari (siparisler, stok hareketleri, urun/kategori islemleri, yetki degisiklikleri)
 - Admin bildirimleri (dusuk stok ve acik stok talepleri)
 - Katalog + sepet + checkout akisi
 - Uye kayit olma ekrani (kullanici adi/sifre ile kayit)
+- Artık yeni ürün eklendiğinde ürünlerin barkodları(ID) uniq oluyor (değiştirilemez kenisine özel) rastgele bir kod alıyor ve bu ID'ler veri tabanında saklanıyor.
 - Yetki paneli:
   - uye arama
   - uye olusturma
